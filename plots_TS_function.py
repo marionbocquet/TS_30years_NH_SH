@@ -807,7 +807,68 @@ def plot_TS_unc_clim(NH_vol_ers1r, NH_vol_ers1r_q025, NH_vol_ers1r_q975, NH_vol_
 
     plt.savefig('vol_TS.pdf')
 
+def plot_TS_unc(NH_vol_ers1r, NH_vol_ers1r_q025, NH_vol_ers1r_q975, NH_vol_ers2r, NH_vol_ers2r_q025, NH_vol_ers2r_q975,
+                NH_vol_env3, NH_vol_env3_q025, NH_vol_env3_q975, NH_vol_c2, NH_vol_c2_q025, NH_vol_c2_q975,
+                SH_vol_ers1r, SH_vol_ers1r_q025, SH_vol_ers1r_q975, SH_vol_ers2r, SH_vol_ers2r_q025,
+                SH_vol_ers2r_q975, SH_vol_env3, SH_vol_env3_q025, SH_vol_env3_q975, SH_vol_c2, SH_vol_c2_q025, SH_vol_c2_q975,
+                df_volumes_NH, df_volumes_SH):
+    figure = plt.figure('Time series', figsize=(12, 6))
+    sns.set_style("ticks")
+    sns.despine()
+    spec = gridspec.GridSpec(ncols=1, nrows=2,
+                             width_ratios=[5, 3], height_ratios=[1, 1])
+    ax0 = figure.add_subplot(spec[0])
+    ax1 = figure.add_subplot(spec[2])
 
+    ax0.fill_between(NH_vol_ers1r.index, NH_vol_ers1r_q025.evolume, NH_vol_ers1r_q975.evolume, alpha=0.5, color='gray',
+                     linewidth=0, label='90% confidence')
+    ax0.fill_between(NH_vol_ers2r.index, NH_vol_ers2r_q025.evolume, NH_vol_ers2r_q975.evolume, alpha=0.5, color='gray',
+                     linewidth=0)
+    ax0.fill_between(NH_vol_env3.index, NH_vol_env3_q025.evolume, NH_vol_env3_q975.evolume, alpha=0.5, color='gray',
+                     linewidth=0)
+    ax0.fill_between(NH_vol_c2.index, NH_vol_c2_q025.evolume, NH_vol_c2_q975.evolume, alpha=0.5, color='gray',
+                     linewidth=0)
+    ax0.plot(NH_vol_c2.index, NH_vol_c2.evolume, '.-', color='#011f4b', markersize=6.5, lw=1, label='CryoSat-2')
+    ax0.plot(NH_vol_env3.index, NH_vol_env3.evolume, '.-', color='#005b96', markersize=6.5, lw=1, label='Envisat')
+    ax0.plot(NH_vol_ers2r.index, NH_vol_ers2r.evolume, '.-', color='#6497b1', markersize=6.5, lw=1, label='ERS-2')
+    ax0.plot(NH_vol_ers1r.index, NH_vol_ers1r.evolume, '.-', color='#9AC0CD', markersize=6.5, lw=1, label='ERS-1')
+
+    ax0.set_ylim(ymin=0)
+
+
+    ax0.legend(ncol=5, frameon=False, loc='upper left', reverse=True)
+    ax0.set_ylabel('Volume $km^3$')
+    ax0.set_xlabel('Year')
+
+    ax1.fill_between(SH_vol_ers1r.index, SH_vol_ers1r_q025.evolume, SH_vol_ers1r_q975.evolume, alpha=0.5, color='gray',
+                     linewidth=0)
+    ax1.plot(SH_vol_ers1r.index, SH_vol_ers1r.evolume, '.-', color='#9AC0CD', markersize=6.5, lw=1, label='ERS-1')
+    ax1.fill_between(SH_vol_ers2r.index, SH_vol_ers2r_q025.evolume, SH_vol_ers2r_q975.evolume, alpha=0.5, color='gray',
+                     linewidth=0)
+    ax1.plot(SH_vol_ers2r.index, SH_vol_ers2r.evolume, '.-', color='#6497b1', markersize=6.5, lw=1, label='ERS-2')
+    ax1.fill_between(SH_vol_env3.index, SH_vol_env3_q025.evolume, SH_vol_env3_q975.evolume, alpha=0.5, color='gray',
+                     linewidth=0)
+    ax1.plot(SH_vol_env3.index, SH_vol_env3.evolume, '.-', color='#005b96', markersize=6.5, lw=1, label='Envisat')
+    ax1.fill_between(SH_vol_c2.index, SH_vol_c2_q025.evolume, SH_vol_c2_q975.evolume, alpha=0.5, color='gray',
+                     linewidth=0)
+    ax1.plot(SH_vol_c2.index, SH_vol_c2.evolume, '.-', color='#011f4b', markersize=6.5, lw=1, label='CryoSat-2')
+    ax1.set_ylim(ymin=0)
+
+    ax1.set_ylabel('Volume $km^3$')
+    ax1.set_xlabel('Year')
+
+
+    ax0.yaxis.set_minor_locator(tck.AutoMinorLocator())
+    ax0.xaxis.set_minor_locator(tck.AutoMinorLocator())
+    ax1.xaxis.set_minor_locator(tck.AutoMinorLocator())
+    ax1.yaxis.set_minor_locator(tck.AutoMinorLocator())
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.96, bottom=0.085, wspace=0.2)
+
+    ax0.set_title('(a)', loc='left')
+    ax1.set_title('(b)', loc='left')
+
+    plt.savefig('vol_TS_noclim.pdf')
 
 def anom_NH(df_volumes_NH_anom):
     """
