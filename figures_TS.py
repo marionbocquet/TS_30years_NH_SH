@@ -355,6 +355,12 @@ df_volumes_NH['time'] = pd.to_datetime(df_volumes_NH.time)
 df_volumes_SH_anom = df_volumes_SH.groupby(df_volumes_SH.index.month).transform(lambda x: (x-x.mean()))
 df_volumes_NH_anom = df_volumes_NH.groupby(df_volumes_NH.index.month).transform(lambda x: (x-x.mean()))
 
+
+
+df_volumes_SH = df_volumes_SH.drop(columns=['time'])
+df_volumes_NH = df_volumes_NH.drop(columns=['time'])
+
+
 df_volumes_SH_anom_per = df_volumes_SH.groupby(df_volumes_SH.index.month).transform(lambda x: 100*(x-x.mean())/x.mean())
 df_volumes_NH_anom_per = df_volumes_NH.groupby(df_volumes_NH.index.month).transform(lambda x: 100*(x-x.mean())/x.mean())
 vol_clim_sh = df_volumes_SH.groupby(df_volumes_SH.index.month).mean()
@@ -402,22 +408,22 @@ SH_vol_cs2_cci['year_of_winter']= SH_vol_cs2_cci['month'].apply(pts.month_of_yea
 NH_vol_nextsim['year'] = NH_vol_nextsim.index.year
 NH_vol_nextsim['month'] = NH_vol_nextsim.index.month
 NH_vol_nextsim['month_of_season'] = NH_vol_nextsim['month'].apply(pts.month_of_year_to_month_of_season_NH)
-NH_vol_nextsim['year_of_winter']= NH_vol_nextsim['month'].apply(pts.month_of_year_to_month_of_season_NH_change_year) + NH_vol_nextsim['year']
+NH_vol_nextsim['year_of_winter'] = NH_vol_nextsim['month'].apply(pts.month_of_year_to_month_of_season_NH_change_year) + NH_vol_nextsim['year']
 
 NH_vol_piomas['month_of_season'] = NH_vol_piomas['month'].apply(pts.month_of_year_to_month_of_season_NH)
-NH_vol_piomas['year_of_winter']= NH_vol_piomas['month'].apply(pts.month_of_year_to_month_of_season_NH_change_year) + NH_vol_piomas['year']
+NH_vol_piomas['year_of_winter'] = NH_vol_piomas['month'].apply(pts.month_of_year_to_month_of_season_NH_change_year) + NH_vol_piomas['year']
 
 
 mean_omip2['year'] = mean_omip2.index.year
 mean_omip2['month'] = mean_omip2.index.month
 mean_omip2['month_of_season'] = mean_omip2['month'].apply(pts.month_of_year_to_month_of_season_NH)
-mean_omip2['year_of_winter']= mean_omip2['month'].apply(pts.month_of_year_to_month_of_season_NH_change_year) + mean_omip2['year']
+mean_omip2['year_of_winter'] = mean_omip2['month'].apply(pts.month_of_year_to_month_of_season_NH_change_year) + mean_omip2['year']
 
 df_volumes_NH['month_of_season'] = df_volumes_NH['month'].apply(pts.month_of_year_to_month_of_season_NH)
 df_volumes_NH['year_of_winter'] = df_volumes_NH['month'].apply(pts.month_of_year_to_month_of_season_NH_change_year) + df_volumes_NH['year']
 
 month_NH = ['', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul','Aug', 'Sep']
-month_SH = ['', 'Mar', 'Apr', 'May', 'Jun', 'Jul','Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb']
+month_SH = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul','Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 """pts.plot_TS_unc_clim(NH_vol_ers1r, NH_vol_ers1r_q025, NH_vol_ers1r_q975, NH_vol_ers2r, NH_vol_ers2r_q025, NH_vol_ers2r_q975,
                      NH_vol_env3, NH_vol_env3_q025, NH_vol_env3_q975, NH_vol_c2, NH_vol_c2_q025, NH_vol_c2_q975,
                      SH_vol_ers1r, SH_vol_ers1r_q025, SH_vol_ers1r_q975, SH_vol_ers2r, SH_vol_ers2r_q025,
