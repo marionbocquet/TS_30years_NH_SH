@@ -345,6 +345,7 @@ pts.figure_S1_NH(df_volumes_NH, df_volumes_NH_rft, NH_vol_cs2smos, NH_vol_cs2_cc
 # ---------------- Figure 8
 
 pts.per_cat(df_volumes_NH, df_volumes_SH)
+pts.per_cat_year(df_volumes_NH, df_volumes_SH)
 
 
 # ---------------- Figure 5

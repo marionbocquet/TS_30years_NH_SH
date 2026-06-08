@@ -43,6 +43,7 @@ def plots_volumes_stack_cat(df_vol, columns, labels, tcmap, title, ax, vmin, vma
     ax.set_ylim(ymin=vmin, ymax=vmax)
     ax.set_title('%s' % title)
     ax.set_ylabel('Volumes ($km^3$)')
+
 def plots_volumes_stack_cat_per(df_vol, ref, columns, labels, tcmap, title, ax):
 
     """
@@ -147,6 +148,34 @@ def plot_pannels_per_cat_glob(df_volumes_NH, df_volumes_SH, var, cmap, cols_cat,
     plots_volumes_stack_cat_per(df_volumes_SH_11, df_volumes_SH_11['%s' % var], cols_cat, labels_cat, cmap,
                                 'November', axs[6, 3])
     return (fig, axs)
+
+
+def plot_pannels_per_cat_glob_year(df_volumes_NH, df_volumes_SH, var, cmap, cols_cat, labels_cat, vmin, vmax_NH, vmax_SH):
+
+    """
+    The function gather the previous function to make the big plot with NH and SH volums per sea ice thickness categories
+    :param df_volumes_NH: Dataframe that contains NH sea ice volumes
+    :param df_volumes_SH: Dataframe that contains SH sea ice volumes
+    :param var: Variable to plot
+    :param cmap: Colormap
+    :param cols_cat: List of name of the categories in df_volumes*
+    :param labels_cat: Label of each of the previous categories
+    :param vmin: Min y value
+    :param vmax_NH: Max y value for NH
+    :param vmax_SH: Max y value for SH
+    :return: figure and axs
+    """
+
+
+    fig, axs = plt.subplots(2, 1, figsize=(12, 6))
+    df_NH_filled = fill_df_nan(df_volumes_NH, '199401', '202304')
+
+    # Plot the volume and the percentage of volume for each month
+
+    plots_volumes_stack_cat(df_NH_filled, cols_cat, labels_cat, cmap, '', axs[0], vmin, vmax_NH)
+    plots_volumes_stack_cat(df_volumes_SH, cols_cat, labels_cat, cmap, '', axs[1], vmin, vmax_SH)
+
+    return (fig, axs)
 def per_cat(df_volumes_NH, df_volumes_SH):
     """
     Gather the previous 3 functions to make the final plot
@@ -160,6 +189,7 @@ def per_cat(df_volumes_NH, df_volumes_SH):
         df_volumes_NH, 'evolume', 'NH')
     trendnh_10 = trendnh_10 * 60 * 60 * 24 * 365.25
     trendunh_10 = abs(abs(l10) - abs(h10)) / 2 * 60 * 60 * 24 * 365.25
+    xnh_10 = pd.to_timedelta(xnh_10, unit='s') + np.datetime64('1970')
 
     trendunh_11 = abs(abs(l11) - abs(h11)) / 2 * 60 * 60 * 24 * 365.25
     trendunh_12 = abs(abs(l12) - abs(h12)) / 2 * 60 * 60 * 24 * 365.25
@@ -174,7 +204,6 @@ def per_cat(df_volumes_NH, df_volumes_SH):
     trendnh_02 = trendnh_02 * 60 * 60 * 24 * 365.25
     trendnh_03 = trendnh_03 * 60 * 60 * 24 * 365.25
     trendnh_04 = trendnh_04 * 60 * 60 * 24 * 365.25
-    xnh_10 = pd.to_timedelta(xnh_10, unit='s') + np.datetime64('1970')
     xnh_11 = pd.to_timedelta(xnh_11, unit='s') + np.datetime64('1970')
     xnh_12 = pd.to_timedelta(xnh_12, unit='s') + np.datetime64('1970')
     xnh_01 = pd.to_timedelta(xnh_01, unit='s') + np.datetime64('1970')
@@ -255,6 +284,82 @@ def per_cat(df_volumes_NH, df_volumes_SH):
     plt.subplots_adjust(bottom=0.05, top=0.95, wspace=0.33)
 
     plt.savefig('vol_per_thick_cat_percentage_cumul.pdf')
+
+
+def per_cat_year(df_volumes_NH, df_volumes_SH):
+    """
+    Gather the previous 3 functions to make the final plot
+    :param df_volumes_NH: Pandas dataframe that gathers NH sea ice volumes
+    :param df_volumes_SH: Pandas dataframe that gathers SH sea ice volumes
+    :return:
+    """
+    cols_cat = ['evolume_cat_1', 'evolume_cat_2', 'evolume_cat_3', 'evolume_cat_4', 'evolume_cat_5', 'evolume_cat_6',
+                'evolume_cat_7', 'evolume_cat_7.1']
+    cols_cat.reverse()
+    labels_cat = ['0-0.5m', '0.5-1m', '1-1.5m', '1.5-2m', '2-3m', '3-4m', '4-5m', '>5m']
+    labels_cat.reverse()
+    cmap = 'gist_earth'
+    tcmap = plt.cm.gist_earth
+    cat = [1, 2, 3, 4, 5, 6, 7, 8]
+    props = dict(boxstyle='round', facecolor='gainsboro', alpha=0.5)
+    ybbox = 0.85
+
+    sns.set_style("ticks")
+    sns.despine()
+
+    df_volumes_SH['ice_year'] = df_volumes_SH.index.year
+    df_volumes_SH.loc[df_volumes_SH.index.month < 3, 'ice_year'] -= 1
+
+
+    df_volumes_NH['ice_year'] = df_volumes_NH.index.year
+    df_volumes_NH.loc[df_volumes_NH.index.month >= 10, 'ice_year'] += 1
+
+    df_season_sh = df_volumes_SH.groupby('ice_year').mean()
+    df_season_nh = df_volumes_NH.groupby('ice_year').mean()
+
+    xnh_10, ynh_10, trendnh_10, l10, h10 = trend(df_season_nh, 'evolume')
+    print(l10, h10)
+    trendnh_10 = trendnh_10 * 60 * 60 * 24 * 365.25
+    trendunh_10 = abs(abs(l10) - abs(h10)) / 2 * 60 * 60 * 24 * 365.25
+    xnh_10 = pd.to_timedelta(xnh_10, unit='s') + np.datetime64('1970')
+
+
+    fig, axs = plot_pannels_per_cat_glob_year(df_volumes_NH, df_volumes_SH, 'evolume', cmap, cols_cat, labels_cat, 0, 16000, 28000)
+    sns.set_style("ticks")
+    sns.despine()
+
+    handles, labels = plt.gca().get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))
+    legend = fig.legend( by_label.values(), by_label.keys(), loc='lower center', ncol=8, frameon = False, reverse=True, title='Thickness categories :', alignment='left', draggable=True)
+    title = legend.get_title()
+    title.set_x(-110)
+    title.set_y(-13.5)
+
+    axs[0].plot(xnh_10, ynh_10, 'r')
+    axs[0].text(0.5, ybbox, '%.2f $\pm$ %.2f $km³/year$' % (trendnh_10, trendunh_10), horizontalalignment='center',
+                   verticalalignment='center', transform=axs[0].transAxes, bbox=props)
+
+    for axxx in axs.ravel():
+        axxx.tick_params(axis='x', labelrotation=25)
+        axxx.xaxis.set_minor_locator(tck.AutoMinorLocator())
+
+    sns.set_style("ticks")
+    sns.despine()
+    axcol1 = fig.add_subplot(2,1,1, frameon=False)
+    axcol1.set_xticks([])
+    axcol1.set_yticks([])
+    axcol1.set_title("Northern Hemisphere (NH)", pad=10, fontsize=12)
+    axcol1.set_title('(a)', loc='left', pad=10)
+
+    axcol2 = fig.add_subplot(2,1,2, frameon=False)
+    axcol2.set_xticks([])
+    axcol2.set_yticks([])
+    axcol2.set_title("Southern Hemisphere (SH)", pad=10, fontsize=12)
+    axcol2.set_title('(b)', loc='left', pad=10)
+    plt.tight_layout()
+    plt.subplots_adjust(bottom=0.15, top=0.94, wspace=0.2)
+    axxx.set_xlabel('Time (Year)')
+    plt.savefig('vol_per_thick_cat_percentage_cumul_year.pdf')
 
 
 # Function to plots appendice A5 et A6
